@@ -1,0 +1,13 @@
+train: ../dataset/train/images
+val: ../dataset/train/images
+test: ../dataset/train/images
+
+nc: 1
+names: ['lime']
+
+roboflow:
+  workspace: sufiyaan-ahmed-s-workspace
+  project: sufiyaan-ahmed-s-workspace
+  version: dataset
+  license: Private
+  url: https://app.roboflow.com/sufiyaan-ahmed-s-workspace/sufiyaan-ahmed-s-workspace/dataset

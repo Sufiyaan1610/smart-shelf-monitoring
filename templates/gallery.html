@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Detection Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial;
+            background: #0f0f0f;
+            color: #eee;
+            padding: 30px;
+        }
+
+        nav {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #222;
+        }
+
+        nav a {
+            color: #888;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        nav a.active,
+        nav a:hover {
+            background: #1a1a1a;
+            color: #2ecc71;
+        }
+
+        nav .logo {
+            color: #2ecc71;
+            font-weight: bold;
+            font-size: 20px;
+            margin-right: auto;
+        }
+
+        h1 {
+            font-size: 22px;
+            margin-bottom: 6px;
+        }
+
+        .sub {
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 24px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: #1a1a1a;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #222;
+        }
+
+        .card.high {
+            border-top: 3px solid #2ecc71;
+        }
+
+        .card.medium {
+            border-top: 3px solid #f39c12;
+        }
+
+        .card.low {
+            border-top: 3px solid #e67e22;
+        }
+
+        .card.out_of_stock {
+            border-top: 3px solid #e74c3c;
+        }
+
+        .card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .info {
+            padding: 12px;
+        }
+
+        .info .comp {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .info .level {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 4px 0;
+        }
+
+        .info .level.high {
+            color: #2ecc71;
+        }
+
+        .info .level.medium {
+            color: #f39c12;
+        }
+
+        .info .level.low {
+            color: #e67e22;
+        }
+
+        .info .level.out_of_stock {
+            color: #e74c3c;
+        }
+
+        .info .time {
+            font-size: 11px;
+            color: #555;
+            margin-top: 6px;
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .pill.high {
+            background: #1a3d2b;
+            color: #2ecc71;
+        }
+
+        .pill.medium {
+            background: #3d3010;
+            color: #f39c12;
+        }
+
+        .pill.low {
+            background: #3d2e1a;
+            color: #e67e22;
+        }
+
+        .pill.out_of_stock {
+            background: #3d1a1a;
+            color: #e74c3c;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <span class="logo">Smart Fridge Monitor</span>
+        <a href="/">Dashboard</a>
+        <a href="/gallery" class="active">Gallery</a>
+        <a href="/weight">Weight Sensor</a>
+        <a href="/metrics">Metrics</a>
+    </nav>
+
+    <h1>Detection Gallery</h1>
+    <p class="sub">All detected frames showing different angles and conditions</p>
+
+    <div class="grid">
+        {% for row in detections %}
+        {% if row[1] == 0 %}
+        {% set s = 'out_of_stock' %}
+        {% set label = 'Out of Stock' %}
+        {% elif row[1] <= 10 %} {% set s='low' %} {% set label='Low' %} {% elif row[1] <=20 %} {% set s='medium' %} {%
+            set label='Medium' %} {% else %} {% set s='high' %} {% set label='High' %} {% endif %} <div
+            class="card {{ s }}">
+            {% if row[2] %}
+            <img src="{{ url_for('static', filename=row[2]) }}">
+            {% endif %}
+            <div class="info">
+                <div class="comp">{{ row[0] }}</div>
+                <div class="level {{ s }}">Stock: {{ label }}</div>
+                <span class="pill {{ s }}">{{ label }}</span>
+                <div class="time">{{ row[3] }}</div>
+            </div>
+    </div>
+    {% endfor %}
+    </div>
+</body>
+
+</html>

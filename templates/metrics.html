@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Metrics</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial; background: #0f0f0f; color: #eee; padding: 30px; }
+        nav { display: flex; gap: 12px; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #222; }
+        nav a { color: #888; text-decoration: none; padding: 8px 16px; border-radius: 8px; font-size: 14px; }
+        nav a.active, nav a:hover { background: #1a1a1a; color: #2ecc71; }
+        nav .logo { color: #2ecc71; font-weight: bold; font-size: 20px; margin-right: auto; }
+        h1 { font-size: 22px; margin-bottom: 6px; }
+        .sub { color: #888; font-size: 13px; margin-bottom: 24px; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .card { background: #1a1a1a; border-radius: 12px; padding: 20px; border: 1px solid #222; }
+        .card .label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .card .val { font-size: 36px; font-weight: bold; color: #2ecc71; }
+        .card .val.warn { color: #f39c12; }
+        .card .hint { font-size: 12px; color: #555; margin-top: 4px; }
+        .section { background: #1a1a1a; border-radius: 12px; padding: 24px; border: 1px solid #222; margin-bottom: 20px; }
+        .section h2 { font-size: 18px; margin-bottom: 16px; }
+        .row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #222; font-size: 14px; }
+        .row:last-child { border-bottom: none; }
+        .row .v { font-weight: bold; color: #2ecc71; }
+        .row .pending { color: #f39c12; }
+        .note { font-size: 11px; color: #555; font-style: italic; margin-top: 14px; }
+    </style>
+</head>
+<body>
+    <nav>
+        <span class="logo"> Smart Fridge Monitor</span>
+        <a href="/">Dashboard</a>
+        <a href="/gallery">Gallery</a>
+        <a href="/weight">Weight Sensor</a>
+        <a href="/metrics" class="active">Metrics</a>
+    </nav>
+
+    <h1> Metrics & Evaluation</h1>
+    <p class="sub">System performance and detection statistics</p>
+
+    <div class="grid">
+        <div class="card">
+            <div class="label">Total Scans</div>
+            <div class="val">{{ metrics.total_scans }}</div>
+            <div class="hint">frames processed</div>
+        </div>
+        <div class="card">
+            <div class="label">Avg Limes Per Frame</div>
+            <div class="val">{{ metrics.avg_count }}</div>
+            <div class="hint">average count</div>
+        </div>
+        <div class="card">
+            <div class="label">Total Alerts</div>
+            <div class="val">{{ metrics.total_alerts }}</div>
+            <div class="hint">MQTT alerts sent</div>
+        </div>
+        <div class="card">
+            <div class="label">Resolved</div>
+            <div class="val">{{ metrics.resolved }}</div>
+            <div class="hint">alerts actioned</div>
+        </div>
+        <div class="card">
+            <div class="label">Resolution Rate</div>
+            <div class="val">{{ metrics.resolution_rate }}%</div>
+            <div class="hint">of all alerts</div>
+        </div>
+        <div class="card">
+            <div class="label">Low Stock Events</div>
+            <div class="val warn">{{ metrics.low_stock_events }}</div>
+            <div class="hint">times below 15</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2> Model Info</h2>
+        <div class="row"><span>Model</span><span class="v">YOLOv8n</span></div>
+        <div class="row"><span>Training Images</span><span class="v">30 annotated frames</span></div>
+        <div class="row"><span>Epochs</span><span class="v">50</span></div>
+        <div class="row"><span>Avg Confidence Score</span><span class="v">~78%</span></div>
+        <div class="row"><span>Inference Speed</span><span class="v">~40ms per image</span></div>
+        <div class="row"><span>Low Stock Threshold</span><span class="v">15 limes</span></div>
+        <div class="row"><span>MQTT QoS Level</span><span class="v">QoS 1</span></div>
+        <div class="row"><span>Database</span><span class="v">SQLite</span></div>
+    </div>
+
+    
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="refresh" content="10">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial; background: #0f0f0f; color: #eee; padding: 30px; }
+        nav { display: flex; gap: 12px; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #222; align-items: center; }
+        nav .logo { color: #2ecc71; font-size: 20px; font-weight: bold; margin-right: auto; }
+        nav a { color: #888; text-decoration: none; padding: 8px 16px; border-radius: 8px; font-size: 14px; }
+        nav a.active, nav a:hover { background: #1a1a1a; color: #2ecc71; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #222; padding-bottom: 20px; }
+        header h1 { color: #2ecc71; font-size: 26px; }
+        header p { color: #888; font-size: 13px; margin-top: 4px; }
+        .badge { background: #1a1a1a; border: 1px solid #2ecc71; color: #2ecc71; padding: 6px 14px; border-radius: 20px; font-size: 12px; }
+        .summary { display: flex; gap: 16px; margin-bottom: 30px; }
+        .summary-card { background: #1a1a1a; border-radius: 10px; padding: 16px 24px; flex: 1; border: 1px solid #222; }
+        .summary-card .label { font-size: 12px; color: #888; margin-bottom: 6px; }
+        .summary-card .value { font-size: 28px; font-weight: bold; color: #2ecc71; }
+        .summary-card.warning .value { color: #e74c3c; }
+        .summary-card.neutral .value { color: #f39c12; }
+        .section-title { font-size: 16px; color: #aaa; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
+        .grid { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 40px; }
+        .card { background: #1a1a1a; border-radius: 12px; overflow: hidden; width: 360px; border: 1px solid #222; }
+        .card.high         { border-top: 4px solid #2ecc71; }
+        .card.medium       { border-top: 4px solid #f39c12; }
+        .card.low          { border-top: 4px solid #e67e22; }
+        .card.out_of_stock { border-top: 4px solid #e74c3c; }
+        .card img { width: 100%; height: 220px; object-fit: cover; }
+        .card-body { padding: 16px; }
+        .card-body .name { font-size: 16px; font-weight: bold; color: #eee; }
+        .card-body .count { font-size: 28px; font-weight: bold; margin: 8px 0; }
+        .high .count         { color: #2ecc71; }
+        .medium .count       { color: #f39c12; }
+        .low .count          { color: #e67e22; }
+        .out_of_stock .count { color: #e74c3c; }
+        .card-body .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .high .status-badge         { background: #1a3d2b; color: #2ecc71; }
+        .medium .status-badge       { background: #3d3010; color: #f39c12; }
+        .low .status-badge          { background: #3d2e1a; color: #e67e22; }
+        .out_of_stock .status-badge { background: #3d1a1a; color: #e74c3c; }
+        .alert-box { background: #3d2e1a; border: 1px solid #f39c12; border-radius: 8px; padding: 10px 14px; margin-top: 10px; font-size: 13px; color: #f39c12; }
+        .card-body .time { font-size: 11px; color: #555; margin-top: 10px; }
+        .upload-section { background: #1a1a1a; border-radius: 12px; padding: 24px; margin-bottom: 40px; border: 1px solid #222; }
+        .upload-section h2 { color: #eee; margin-bottom: 16px; font-size: 18px; }
+        .upload-form { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .upload-form input[type=file] { background: #0f0f0f; border: 1px solid #333; border-radius: 8px; padding: 10px; color: #eee; flex: 1; }
+        .upload-form button { background: #2ecc71; color: #000; border: none; padding: 10px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; }
+        .upload-form button:hover { background: #27ae60; }
+        .result-img { margin-top: 20px; }
+        .result-img img { max-width: 100%; border-radius: 10px; border: 1px solid #333; }
+        .result-img p { color: #2ecc71; font-size: 15px; margin-bottom: 10px; font-weight: bold; }
+        .chart-section { background: #1a1a1a; border-radius: 12px; padding: 24px; margin-bottom: 40px; border: 1px solid #222; }
+        .chart-section h2 { color: #eee; margin-bottom: 20px; font-size: 18px; }
+        .history-section { background: #1a1a1a; border-radius: 12px; padding: 24px; border: 1px solid #222; }
+        .history-section h2 { color: #eee; margin-bottom: 16px; font-size: 18px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; color: #888; font-size: 12px; text-transform: uppercase; padding: 10px; border-bottom: 1px solid #222; }
+        td { padding: 12px 10px; border-bottom: 1px solid #1a1a1a; font-size: 14px; color: #ccc; }
+        tr:hover td { background: #222; }
+        .pill { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; }
+        .pill.high         { background: #1a3d2b; color: #2ecc71; }
+        .pill.medium       { background: #3d3010; color: #f39c12; }
+        .pill.low          { background: #3d2e1a; color: #e67e22; }
+        .pill.out_of_stock { background: #3d1a1a; color: #e74c3c; }
+        .resolve-btn { background: #e74c3c; color: white; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+        .resolve-btn:hover { background: #c0392b; }
+    </style>
+</head>
+<body>
+    <nav>
+        <span class="logo">Smart Fridge Monitor</span>
+        <a href="/" class="active">Dashboard</a>
+        <a href="/gallery">Gallery</a>
+        <a href="/weight">Weight Sensor</a>
+        <a href="/metrics">Metrics</a>
+    </nav>
+
+    <header>
+        <div>
+            <h1>Smart Fridge Stock Monitor</h1>
+            <p>Your Warehouse</p>
+        </div>
+        <div class="badge">System Online</div>
+    </header>
+
+    <div class="summary">
+        <div class="summary-card">
+            <div class="label">Total Limes Detected</div>
+            <div class="value">{{ total_limes }}</div>
+        </div>
+        <div class="summary-card {% if low_stock_count > 0 %}warning{% else %}neutral{% endif %}">
+            <div class="label">Low Stock Alerts</div>
+            <div class="value">{{ low_stock_count }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">Compartments Monitored</div>
+            <div class="value">{{ stock|length }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">Last Scan</div>
+            <div class="value" style="font-size:16px; margin-top:6px;">{{ last_scan }}</div>
+        </div>
+    </div>
+
+    <div class="section-title">Compartment Status</div>
+    <div class="grid">
+        {% for row in stock %}
+            {% if row[4] == 0 %}
+                {% set s = 'out_of_stock' %}
+                {% set label = 'Out of Stock' %}
+            {% elif row[4] <= 10 %}
+                {% set s = 'low' %}
+                {% set label = 'Low' %}
+            {% elif row[4] <= 20 %}
+                {% set s = 'medium' %}
+                {% set label = 'Medium' %}
+            {% else %}
+                {% set s = 'high' %}
+                {% set label = 'High' %}
+            {% endif %}
+        <div class="card {{ s }}">
+            {% if row[5] %}
+            <img src="{{ url_for('static', filename=row[5]) }}" alt="Detected limes">
+            {% endif %}
+            <div class="card-body">
+                <div class="name">{{ row[0] }}</div>
+                <div class="count">Stock: {{ label }}</div>
+                <span class="status-badge">{{ label }}</span>
+                {% if s == 'low' %}
+                    <div class="alert-box">Stock is low! Consider restocking soon.</div>
+                {% elif s == 'medium' %}
+                    <div class="alert-box" style="border-color:#f39c12; background:#3d3010; color:#f39c12;">Stock is at medium level.</div>
+                {% elif s == 'out_of_stock' %}
+                    <div class="alert-box" style="border-color:#e74c3c; background:#3d1a1a; color:#e74c3c;">Out of stock! Restock immediately.</div>
+                {% endif %}
+                <div class="time">Last updated: {{ row[2] }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="upload-section">
+        <h2>Upload Image for Live Detection</h2>
+        <form class="upload-form" action="/upload" method="POST" enctype="multipart/form-data">
+            <input type="file" name="image" accept="image/*" required>
+            <button type="submit">🔍 Detect Limes</button>
+        </form>
+        {% if upload_result %}
+        <div class="result-img">
+            <p>Stock Level: {{ upload_level }}!</p>
+            <img src="{{ url_for('static', filename=upload_result) }}" alt="Detection result">
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="chart-section">
+        <h2>Lime Count History</h2>
+        <canvas id="stockChart" height="80"></canvas>
+    </div>
+
+    <div class="history-section">
+        <h2>Recent Detection History</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Compartment</th>
+                    <th>Stock Level</th>
+                    <th>Status</th>
+                    <th>Timestamp</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in history %}
+                    {% if row[4] == 0 %}
+                        {% set s = 'out_of_stock' %}
+                        {% set label = 'Out of Stock' %}
+                    {% elif row[4] <= 10 %}
+                        {% set s = 'low' %}
+                        {% set label = 'Low' %}
+                    {% elif row[4] <= 20 %}
+                        {% set s = 'medium' %}
+                        {% set label = 'Medium' %}
+                    {% else %}
+                        {% set s = 'high' %}
+                        {% set label = 'High' %}
+                    {% endif %}
+                <tr>
+                    <td>{{ row[1] }}</td>
+                    <td>{{ row[4] }}</td>
+                    <td><span class="pill {{ s }}">{{ label }}</span></td>
+                    <td>{{ row[5] }}</td>
+                    <td>
+                        {% if row[6] == 0 %}
+                        <form action="/resolve/{{ row[0] }}" method="POST" style="margin:0">
+                            <button type="submit" class="resolve-btn">Mark Resolved</button>
+                        </form>
+                        {% else %}
+                        <span style="color:#2ecc71; font-size:12px;">✓ Resolved</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const labels = {{ chart_labels | tojson }};
+        const leftData = {{ chart_left | tojson }};
+        const rightData = {{ chart_right | tojson }};
+        new Chart(document.getElementById('stockChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: 'Left Bottom', data: leftData, borderColor: '#2ecc71', backgroundColor: 'rgba(46,204,113,0.1)', tension: 0.4, fill: true },
+                    { label: 'Right Bottom', data: rightData, borderColor: '#3498db', backgroundColor: 'rgba(52,152,219,0.1)', tension: 0.4, fill: true },
+                    { label: 'Low Stock Threshold', data: Array(labels.length).fill(10), borderColor: '#e74c3c', borderDash: [5, 5], pointRadius: 0, fill: false }
+                ]
+            },
+            options: {
+                plugins: { legend: { labels: { color: '#aaa' } } },
+                scales: {
+                    x: { ticks: { color: '#555' }, grid: { color: '#1a1a1a' } },
+                    y: { ticks: { color: '#555' }, grid: { color: '#222' } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
